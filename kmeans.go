@@ -3,11 +3,41 @@
 package kmeans
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 
-	"github.com/muesli/clusters"
+	"github.com/onebittech/clusters"
 )
+
+type ConfigOption func(*Kmeans) error
+
+func IterationThresholdConfig(it int) ConfigOption {
+	return func(k *Kmeans) error {
+		if it == 0 {
+			return errors.New("invalid iteration threshold. Cannot be 0 (zero)")
+		}
+		k.iterationThreshold = it
+		return nil
+	}
+}
+
+func DeltaThresholdConfig(dt float64) ConfigOption {
+	return func(k *Kmeans) error {
+		if dt <= 0.0 || dt >= 1.0 {
+			return errors.New("threshold is out of bounds (must be >0.0 and <1.0, in percent)")
+		}
+		k.deltaThreshold = dt
+		return nil
+	}
+}
+
+func PlotterConfig(p Plotter) ConfigOption {
+	return func(k *Kmeans) error {
+		k.plotter = p
+		return nil
+	}
+}
 
 // Kmeans configuration/option struct
 type Kmeans struct {
@@ -24,6 +54,29 @@ type Kmeans struct {
 // The Plotter interface lets you implement your own plotters
 type Plotter interface {
 	Plot(cc clusters.Clusters, iteration int) error
+}
+
+// NewWithOptions returns a Kmeans configuration struct with custom settings
+func NewWithConfigOptions(options ...ConfigOption) (*Kmeans, error) {
+	k := Kmeans{}
+
+	for _, opt := range options {
+		if err := opt(&k); err != nil {
+			return nil, err
+		}
+
+	}
+	return &k, nil
+
+	// if deltaThreshold <= 0.0 || deltaThreshold >= 1.0 {
+	// 	return Kmeans{}, fmt.Errorf("threshold is out of bounds (must be >0.0 and <1.0, in percent)")
+	// }
+
+	// return Kmeans{
+	// 	plotter:            plotter,
+	// 	deltaThreshold:     deltaThreshold,
+	// 	iterationThreshold: 96,
+	// }, nil
 }
 
 // NewWithOptions returns a Kmeans configuration struct with custom settings
