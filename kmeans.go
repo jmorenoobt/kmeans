@@ -67,16 +67,6 @@ func NewWithConfigOptions(options ...ConfigOption) (*Kmeans, error) {
 
 	}
 	return &k, nil
-
-	// if deltaThreshold <= 0.0 || deltaThreshold >= 1.0 {
-	// 	return Kmeans{}, fmt.Errorf("threshold is out of bounds (must be >0.0 and <1.0, in percent)")
-	// }
-
-	// return Kmeans{
-	// 	plotter:            plotter,
-	// 	deltaThreshold:     deltaThreshold,
-	// 	iterationThreshold: 96,
-	// }, nil
 }
 
 // NewWithOptions returns a Kmeans configuration struct with custom settings
